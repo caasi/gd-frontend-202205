@@ -1,0 +1,11 @@
+.App {
+  background-color: #282c34;
+  color: white;
+  height: 100vh;
+}
+
+.App-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
