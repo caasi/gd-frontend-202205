@@ -9,3 +9,15 @@
   margin: 0 auto;
   padding: 16px;
 }
+
+li {
+  display: flex;
+}
+
+li a.link--username {
+  width: 15ch;
+}
+
+.link--username:hover {
+  font-weight: bold;
+}
