@@ -4,7 +4,7 @@ import { delay } from './time'
 
 // XXX: you should not change this file
 
-const samepleUserList: User[] = [{
+const sampleUserList: User[] = [{
   _id: '119',
   type: 'natural',
   name: '大中天',
@@ -28,7 +28,7 @@ const samepleUserList: User[] = [{
 
 export const getUserList = (): Promise<User[]> => {
   return Promise
-    .resolve(samepleUserList)
+    .resolve(sampleUserList)
     .then(delay(3000))
 }
 
