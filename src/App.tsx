@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, ChangeEventHandler, RefObject, InputHTMLAttributes } from 'react'
+import { useState, useEffect, useCallback, ChangeEventHandler, RefObject, InputHTMLAttributes, useMemo } from 'react'
 import { User } from './libs/user'
 import { Post } from './libs/post'
 import { getUserList, getPostListById } from './libs/api'
@@ -15,11 +15,19 @@ const SearchTextField = (props: InputHTMLAttributes<HTMLInputElement>) => {
 };
 
 function App() {
-  // const inputRef = useRef<HTMLInputElement>(null)
   const [filter, setFilter] = useState('')
   const [currentUser, setCurrentUser] = useState<string>()
   const [users, setUsers] = useState<User[]>([])
-  const [posts, setPosts] = useState<Post[]>([])
+
+  const memorizedPostMap = useMemo(() => {
+    const userPostMap: Record<string, Post[]> = {};
+    users.forEach((user) => {
+      getPostListById(user._id).then((posts) => {
+        userPostMap[user._id] = posts;
+      });
+    });
+    return userPostMap;
+  }, [users]);
 
   const UserList = useCallback(() => {
     const List = users
@@ -47,7 +55,8 @@ function App() {
   }, [users, filter]);
 
   const PostList = useCallback(() => {
-    if (posts.length === 0) return <p>No posts</p>;
+    if (!currentUser || !memorizedPostMap[currentUser] || memorizedPostMap[currentUser].length === 0) return <p>No posts</p>;
+    const posts = memorizedPostMap[currentUser];
     return (
       <ul>
         {posts.map((post) => (
@@ -57,24 +66,17 @@ function App() {
         ))}
       </ul>
     );
-  }, [posts]);
+  }, [currentUser, memorizedPostMap]);
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
     setFilter(event.target.value);
     setCurrentUser(undefined);
-    setPosts([]);
   }, []);
 
   useEffect(() => {
     getUserList()
       .then((users) => setUsers(users))
-  })
-  useEffect(() => {
-    if (currentUser) {
-      getPostListById(currentUser)
-        .then((posts) => setPosts(posts))
-    }
-  }, [currentUser])
+  }, [])
 
   return (
     <div className="App">
