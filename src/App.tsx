@@ -4,8 +4,8 @@ import { Post } from './libs/post'
 import { getUserList, getPostListById } from './libs/api'
 import './App.css'
 
-const SearchTextField = (props: { setFilter: (filter: string) => void }) => {
-  const { setFilter } = props;
+const SearchTextField = (props: { onChange: (filter: string) => void }) => {
+  const { onChange } = props;
   const inputRef = useRef<HTMLInputElement>(null)
   return (
     <input
@@ -13,7 +13,7 @@ const SearchTextField = (props: { setFilter: (filter: string) => void }) => {
       type="text"
       placeholder="filter"
       onChange={() => {
-        if (inputRef.current) setFilter(inputRef.current.value)
+        if (inputRef.current) onChange(inputRef.current.value)
       }}
     />
   );
@@ -80,7 +80,11 @@ function App() {
         <h1>Hello Vite + React!</h1>
         <section>
           <h2>Users</h2>
-          <SearchTextField setFilter={setFilter} />
+          <SearchTextField onChange={(filterText) => {
+            setFilter(filterText);
+            setCurrentUser(undefined);
+            setPosts([]);
+          }} />
           {UserList()}
         </section>
         <section>
