@@ -19,22 +19,22 @@ function App() {
   const [currentUser, setCurrentUser] = useState<string>()
   const [users, setUsers] = useState<User[]>([])
 
-  const memorizedUserIds = useMemo(() => users.map((user) => user._id), [users]);
+  const memorizedUser = useMemo(() => users.map((user) => user), [users]);
 
   const memorizedPostMap = useMemo(() => {
     const userPostMap: Record<string, Post[]> = {};
     // test useMemo is run
-    console.log('memorizedPostMap', memorizedUserIds);
-    memorizedUserIds.forEach((id) => {
-      getPostListById(id).then((posts) => {
-        userPostMap[id] = posts;
+    console.log('memorizedPostMap', memorizedUser);
+    memorizedUser.forEach((user) => {
+      getPostListById(user._id).then((posts) => {
+        userPostMap[user._id] = posts;
       });
     });
     return userPostMap;
-  }, [memorizedUserIds]);
+  }, [memorizedUser]);
 
   const UserList = useCallback(() => {
-    const List = users
+    const List = memorizedUser
     .filter((user) => new RegExp(filter, 'i').test(user.name))
     .map((user) => (
       <li key={`${user._id}`}>
@@ -56,7 +56,7 @@ function App() {
         {List}
       </ul>
     );
-  }, [users, filter]);
+  }, [memorizedUser, filter]);
 
   const PostList = useCallback(() => {
     if (!currentUser || !memorizedPostMap[currentUser] || memorizedPostMap[currentUser].length === 0) return <p>No posts</p>;
