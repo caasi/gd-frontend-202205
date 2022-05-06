@@ -24,8 +24,8 @@ function App() {
   const UserList = useCallback(() => {
     const List = users
     .filter((user) => new RegExp(filter, 'i').test(user.name))
-    .map((user, idx) => (
-      <li key={`${user.type}-${idx}`}>
+    .map((user) => (
+      <li key={`${user._id}`}>
         <a
           href="#"
           onClick={(evt) => {
