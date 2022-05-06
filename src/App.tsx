@@ -40,8 +40,8 @@ function App() {
           <ul>
             {users
               .filter((user) => new RegExp(filter, 'i').test(user.name))
-              .map((user) => (
-                <li key={user.type}>
+              .map((user, idx) => (
+                <li key={`${user.type}-${idx}`}>
                   <a
                     href="#"
                     onClick={(evt) => {
