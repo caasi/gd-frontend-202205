@@ -19,15 +19,19 @@ function App() {
   const [currentUser, setCurrentUser] = useState<string>()
   const [users, setUsers] = useState<User[]>([])
 
+  const memorizedUserIds = useMemo(() => users.map((user) => user._id), [users]);
+
   const memorizedPostMap = useMemo(() => {
     const userPostMap: Record<string, Post[]> = {};
-    users.forEach((user) => {
-      getPostListById(user._id).then((posts) => {
-        userPostMap[user._id] = posts;
+    // test useMemo is run
+    console.log('memorizedPostMap', memorizedUserIds);
+    memorizedUserIds.forEach((id) => {
+      getPostListById(id).then((posts) => {
+        userPostMap[id] = posts;
       });
     });
     return userPostMap;
-  }, [users]);
+  }, [memorizedUserIds]);
 
   const UserList = useCallback(() => {
     const List = users
