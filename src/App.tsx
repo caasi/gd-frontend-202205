@@ -1,25 +1,21 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback, ChangeEventHandler, RefObject, InputHTMLAttributes } from 'react'
 import { User } from './libs/user'
 import { Post } from './libs/post'
 import { getUserList, getPostListById } from './libs/api'
 import './App.css'
 
-const SearchTextField = (props: { onChange: (filter: string) => void }) => {
-  const { onChange } = props;
-  const inputRef = useRef<HTMLInputElement>(null)
+const SearchTextField = (props: InputHTMLAttributes<HTMLInputElement>) => {
   return (
     <input
-      ref={inputRef}
       type="text"
       placeholder="filter"
-      onChange={() => {
-        if (inputRef.current) onChange(inputRef.current.value)
-      }}
+      {...props}
     />
   );
 };
 
 function App() {
+  // const inputRef = useRef<HTMLInputElement>(null)
   const [filter, setFilter] = useState('')
   const [currentUser, setCurrentUser] = useState<string>()
   const [users, setUsers] = useState<User[]>([])
@@ -63,6 +59,12 @@ function App() {
     );
   }, [posts]);
 
+  const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
+    setFilter(event.target.value);
+    setCurrentUser(undefined);
+    setPosts([]);
+  }, []);
+
   useEffect(() => {
     getUserList()
       .then((users) => setUsers(users))
@@ -80,11 +82,7 @@ function App() {
         <h1>Hello Vite + React!</h1>
         <section>
           <h2>Users</h2>
-          <SearchTextField onChange={(filterText) => {
-            setFilter(filterText);
-            setCurrentUser(undefined);
-            setPosts([]);
-          }} />
+          <SearchTextField value={filter} onChange={handleChange} />
           {UserList()}
         </section>
         <section>
