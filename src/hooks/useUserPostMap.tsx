@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
-import { User } from './libs/user'
-import { Post } from './libs/post'
-import { getUserList, getPostListById } from './libs/api'
+import { User } from '../libs/user'
+import { Post } from '../libs/post'
+import { getUserList, getPostListById } from '../libs/api'
 
 export default function useUserPostMap() {
   const [users, setUsers] = useState<User[]>([])
