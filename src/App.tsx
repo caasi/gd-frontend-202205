@@ -3,6 +3,7 @@ import { User } from './libs/user'
 import { Post } from './libs/post'
 import { getUserList, getPostListById } from './libs/api'
 import './App.css'
+import useUserPostMap from './useUserPostMap'
 
 const SearchTextField = (props: InputHTMLAttributes<HTMLInputElement>) => {
   return (
@@ -17,21 +18,7 @@ const SearchTextField = (props: InputHTMLAttributes<HTMLInputElement>) => {
 function App() {
   const [filter, setFilter] = useState('')
   const [currentUser, setCurrentUser] = useState<string>()
-  const [users, setUsers] = useState<User[]>([])
-
-  const memorizedUser = useMemo(() => users.map((user) => user), [users]);
-
-  const memorizedPostMap = useMemo(() => {
-    const userPostMap: Record<string, Post[]> = {};
-    // test useMemo is run
-    console.log('memorizedPostMap', memorizedUser);
-    memorizedUser.forEach((user) => {
-      getPostListById(user._id).then((posts) => {
-        userPostMap[user._id] = posts;
-      });
-    });
-    return userPostMap;
-  }, [memorizedUser]);
+  const { memorizedPostMap, memorizedUser } = useUserPostMap();
 
   const UserList = useCallback(() => {
     const List = memorizedUser
@@ -76,11 +63,6 @@ function App() {
     setFilter(event.target.value);
     setCurrentUser(undefined);
   }, []);
-
-  useEffect(() => {
-    getUserList()
-      .then((users) => setUsers(users))
-  }, [])
 
   return (
     <div className="App">
