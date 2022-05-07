@@ -3,7 +3,7 @@ import { User } from './libs/user'
 import { Post } from './libs/post'
 import { getUserList, getPostListById } from './libs/api'
 import './App.css'
-import useUserPostMap from './useUserPostMap'
+import useUserPostMap from './hooks/useUserPostMap'
 
 const SearchTextField = (props: InputHTMLAttributes<HTMLInputElement>) => {
   return (
@@ -18,10 +18,11 @@ const SearchTextField = (props: InputHTMLAttributes<HTMLInputElement>) => {
 function App() {
   const [filter, setFilter] = useState('')
   const [currentUser, setCurrentUser] = useState<string>()
-  const { memorizedPostMap, memorizedUser } = useUserPostMap();
+  const { memorizedPosts, memorizedUsers } = useUserPostMap();
 
+  console.log('App', memorizedPosts, memorizedUsers);
   const UserList = useCallback(() => {
-    const List = memorizedUser
+    const List = memorizedUsers
     .filter((user) => new RegExp(filter, 'i').test(user.name))
     .map((user) => (
       <li key={user._id}>
@@ -43,11 +44,11 @@ function App() {
         {List}
       </ul>
     );
-  }, [memorizedUser, filter]);
+  }, [memorizedUsers, filter]);
 
   const PostList = useCallback(() => {
-    if (!currentUser || !memorizedPostMap[currentUser] || memorizedPostMap[currentUser].length === 0) return <p>No posts</p>;
-    const posts = memorizedPostMap[currentUser];
+    if (!currentUser || !memorizedPosts[currentUser] || memorizedPosts[currentUser].length === 0) return <p>No posts</p>;
+    const posts = memorizedPosts[currentUser];
     return (
       <ul>
         {posts.map((post) => (
@@ -57,7 +58,7 @@ function App() {
         ))}
       </ul>
     );
-  }, [currentUser, memorizedPostMap]);
+  }, [currentUser, memorizedPosts]);
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
     setFilter(event.target.value);

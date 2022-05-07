@@ -1,31 +1,50 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { User } from '../libs/user'
 import { Post } from '../libs/post'
 import { getUserList, getPostListById } from '../libs/api'
+import usePromise from './use-promise'
 
 export default function useUserPostMap() {
-  const [users, setUsers] = useState<User[]>([])
-  const memorizedUser = useMemo(() => users.map((user) => user), [users]);
-  
-  const memorizedPostMap = useMemo(() => {
+  // get user list by usePromise
+  const memorizedGetUserListPromise = useMemo(() => getUserList(), []);
+  const [users,,] = usePromise<User[]>(memorizedGetUserListPromise);
+
+  // get post list by usePromise
+  const memorizedGetUserPostsPromise = useMemo(() => {
+    if (users) {
+      const promises = users.map((user) => getPostListById(user._id));
+      return Promise.all(promises).then((postsArray) => postsArray);
+    }
+    return undefined;
+  }, [users]);
+  const [posts,,] = usePromise<Post[][]>(memorizedGetUserPostsPromise);
+
+  return useMemo(() => {
     const userPostMap: Record<string, Post[]> = {};
-    // test useMemo is run
-    console.log('memorizedPostMap', memorizedUser);
-    memorizedUser.forEach((user) => {
-      getPostListById(user._id).then((posts) => {
-        userPostMap[user._id] = posts;
+
+    // early return when posts not ready
+    if (users && !posts) {
+      return {
+        memorizedUsers: users,
+        memorizedPosts: {}
+      };
+    }
+
+    if (users && posts) {
+      // assign posts to object by user array index
+      users.forEach((user, idx) => {
+        userPostMap[user._id] = posts[idx];
       });
-    });
-    return userPostMap;
-  }, [memorizedUser]);
 
-  useEffect(() => {
-    getUserList()
-      .then((usersResponse) => setUsers(usersResponse))
-  }, [])
+      return {
+        memorizedUsers: users,
+        memorizedPosts: userPostMap
+      };
+    }
 
-  return {
-    memorizedUser,
-    memorizedPostMap
-  };
+    return {
+      memorizedUsers: [],
+      memorizedPosts: {}
+    };
+  }, [users, posts]);
 }
