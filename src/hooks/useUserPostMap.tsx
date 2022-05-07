@@ -13,7 +13,7 @@ export default function useUserPostMap() {
   const memorizedGetUserPostsPromise = useMemo(() => {
     if (users) {
       const promises = users.map((user) => getPostListById(user._id));
-      return Promise.all(promises).then((postsArray) => postsArray);
+      return Promise.all(promises);
     }
     return undefined;
   }, [users]);
