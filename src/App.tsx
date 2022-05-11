@@ -1,20 +1,21 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { User } from './libs/user'
 import { Post } from './libs/post'
 import { getUserList, getPostListById } from './libs/api'
 import './App.css'
+import usePromise from './hooks/use-promise'
 
 function App() {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [filter, setFilter] = useState('')
+  const [filter, setFilter] = useState<string>('')
   const [currentUser, setCurrentUser] = useState<string>()
   const [users, setUsers] = useState<User[]>([])
   const [posts, setPosts] = useState<Post[]>([])
 
-  useEffect(() => {
-    getUserList()
-      .then((users) => setUsers(users))
-  })
+  const [ userList, error, pending ] = usePromise(getUserList())
+  // useEffect(() => {
+  //   getUserList()
+  //     .then((users) => setUsers(users))
+  // })
 
   useEffect(() => {
     if (currentUser) {
@@ -30,18 +31,17 @@ function App() {
         <section>
           <h2>Users</h2>
           <input
-            ref={inputRef}
             type="text"
             placeholder="filter"
-            onChange={() => {
-              if (inputRef.current) setFilter(inputRef.current.value)
+            onChange={(e) => {
+              setFilter(e.target.value);
             }}
           />
           <ul>
-            {users
+            {userList
               .filter((user) => new RegExp(filter, 'i').test(user.name))
               .map((user) => (
-                <li key={user.type}>
+                <li key={user._id}>
                   <a
                     href="#"
                     onClick={(evt) => {
