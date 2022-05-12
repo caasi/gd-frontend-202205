@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-type StateTuple<T, E> = [T | undefined, Error | E | undefined, number];
+export type StateTuple<T> = [T | undefined, Error | undefined, number];
 
-export type ResultTuple<T, E = void> = [T | undefined, Error | E | undefined, boolean];
+export type ResultTuple<T> = [T | undefined, Error | undefined, boolean];
 
-function usePromise<T, E = void>(promise?: Promise<T>): ResultTuple<T, E> {
-  const [[value, error, pending], setResult] = useState<StateTuple<T, E>>([
+function usePromise<T>(promise?: Promise<T>): ResultTuple<T> {
+  const [[value, error, pending], setResult] = useState<StateTuple<T>>([
     undefined,
     undefined,
     0,
@@ -20,8 +20,8 @@ function usePromise<T, E = void>(promise?: Promise<T>): ResultTuple<T, E> {
     setResult(([value, error, pending]) => [value, error, pending + 1]);
 
     promise.then(
-      x => setResult(([, , pending]) => [x, undefined, pending - 1]),
-      e => setResult(([, , pending]) => [undefined, e, pending - 1])
+      (x) => setResult(([, , pending]) => [x, undefined, pending - 1]),
+      (e) => setResult(([, , pending]) => [undefined, e, pending - 1])
     );
   }, [promise]);
 

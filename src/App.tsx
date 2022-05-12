@@ -4,59 +4,21 @@ import { Post } from "./libs/post";
 
 import { getUserList, getPostListById } from "./libs/api";
 import usePromise from "./hooks/usePromise";
+import useCancelablePromise from "./hooks/useCancelablePromise";
 import "./App.css";
 
 const userListPromise = getUserList();
 
-const createCancelablePromise = <T,>(inputPromise: Promise<T>) => {
-  let cancel: Function | null = null;
-  const controller: Promise<boolean> = new Promise((res, rej) => {
-    cancel = () => {
-      rej("cancel");
-    };
-  });
-
-  const promise: Promise<any> = Promise.race([inputPromise, controller]);
-  return {
-    promise,
-    cancel,
-  };
-};
-
-
-
 function App() {
   const [filter, setFilter] = useState("");
-  const [currentUser, setCurrentUser] = useState<string>();
-  const [userList = []] = usePromise<User[], void>(userListPromise);
+  const [currentUser, setCurrentUser] = useState<User["_id"] | "">("");
+  const [userList = []] = usePromise<User[]>(userListPromise);
+  const [userPost = [], postError, postPending] = useCancelablePromise(
+    getPostListById,
+    currentUser
+  );
 
-  const [userPostPromise, setUserPostPromise] = useState<any>(undefined);
-
-
-
-  const [userPost = [], postError, postPending] =
-    usePromise<Post[], "cancel">(userPostPromise);
-  const cancelRef = useRef<Function | null>(null);
-
-  useEffect(() => {
-    if (!currentUser) return;
-    if (cancelRef.current) {
-      cancelRef.current();
-    }
-
-    const { promise, cancel } = createCancelablePromise(
-      getPostListById(currentUser)
-    );
-
-    setUserPostPromise(promise);
-
-    cancelRef.current = cancel;
-  }, [currentUser]);
-
-  const isPostLoading =
-    postPending || postError === "cancel";
-
-  const posts = isPostLoading ? (
+  const posts = postPending ? (
     <p>isLoading</p>
   ) : userPost && userPost.length === 0 ? (
     <p>No posts</p>
@@ -105,7 +67,7 @@ function App() {
         <section>
           <h2>Posts</h2>
           {posts}
-          <div>{typeof postError === 'string' && postError}</div>
+          <div>{typeof postError === "string" && postError}</div>
         </section>
       </div>
     </div>
