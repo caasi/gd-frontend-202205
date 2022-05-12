@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 
-type StateTuple<T> = [T | undefined, Error | undefined, number];
+type StateTuple<T, E> = [T | undefined, Error | E | undefined, number];
 
-type ResultTuple<T> = [T | undefined, Error | undefined, boolean];
+export type ResultTuple<T, E = void> = [T | undefined, Error | E | undefined, boolean];
 
-function usePromise<T>(promise?: Promise<T>): ResultTuple<T> {
-  const [[value, error, pending], setResult] = useState<StateTuple<T>>([
+function usePromise<T, E = void>(promise?: Promise<T>): ResultTuple<T, E> {
+  const [[value, error, pending], setResult] = useState<StateTuple<T, E>>([
     undefined,
     undefined,
     0,
@@ -18,7 +18,7 @@ function usePromise<T>(promise?: Promise<T>): ResultTuple<T> {
     }
 
     setResult(([value, error, pending]) => [value, error, pending + 1]);
-    
+
     promise.then(
       x => setResult(([, , pending]) => [x, undefined, pending - 1]),
       e => setResult(([, , pending]) => [undefined, e, pending - 1])
