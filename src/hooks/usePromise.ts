@@ -18,6 +18,7 @@ function usePromise<T>(promise?: Promise<T>): ResultTuple<T> {
     }
 
     setResult(([value, error, pending]) => [value, error, pending + 1]);
+    
     promise.then(
       x => setResult(([, , pending]) => [x, undefined, pending - 1]),
       e => setResult(([, , pending]) => [undefined, e, pending - 1])
