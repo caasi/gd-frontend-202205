@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {StateTuple, ResultTuple} from './usePromise'
 
 const CANCEL = Symbol('cancel')
@@ -33,13 +33,11 @@ export default function useCancelablePromise<T>(
     undefined,
     0,
   ]);
-
   useEffect(() => {
     setResult(([value, error, pending]) => [value, error, pending + 1]);
     if (controllerRef.current) {
       controllerRef.current();
     }
-
     const { promise: wrappedPromise, cancel } = createCancelablePromise(
       promise
     );
@@ -56,7 +54,10 @@ export default function useCancelablePromise<T>(
       })
 
     controllerRef.current = cancel;
-  }, [...deps]);
+  }, deps);
+
+
+  
 
   
   return [value, error, pending > 0];
