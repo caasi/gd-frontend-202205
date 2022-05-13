@@ -14,8 +14,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState<User["_id"] | "">("");
   const [userList = []] = usePromise<User[]>(userListPromise);
   const [userPost = [], postError, postPending] = useCancelablePromise(
-    getPostListById,
-    currentUser
+    getPostListById(currentUser),
+    [currentUser]
   );
 
   const posts = postPending ? (

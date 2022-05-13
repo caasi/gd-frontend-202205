@@ -23,11 +23,9 @@ const createCancelablePromise = <T>(inputPromise: Promise<T>) => {
   };
 };
 
-type PromiseCreator<T> = (...props: any[]) => Promise<T>;
-
 export default function useCancelablePromise<T>(
-  promiseCreator: PromiseCreator<T>,
-  ...props: any[]
+  promise: Promise<T>,
+  deps: any[]
 ): ResultTuple<T> {
   const controllerRef = useRef<Function | null>(null);
   const [[value, error, pending], setResult] = useState<StateTuple<T>>([
@@ -42,11 +40,11 @@ export default function useCancelablePromise<T>(
       controllerRef.current();
     }
 
-    const { promise, cancel } = createCancelablePromise(
-      promiseCreator(...props)
+    const { promise: wrappedPromise, cancel } = createCancelablePromise(
+      promise
     );
 
-    promise
+    wrappedPromise
       .then((result) => {
         setResult([result, undefined, 0]);
         controllerRef.current = null;
@@ -58,7 +56,7 @@ export default function useCancelablePromise<T>(
       })
 
     controllerRef.current = cancel;
-  }, [...props]);
+  }, [...deps]);
 
   
   return [value, error, pending > 0];
