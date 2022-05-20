@@ -30,18 +30,18 @@ function App() {
         <section>
           <h2>Users</h2>
           <input
-            ref={inputRef}
+            value={filter}
             type="text"
             placeholder="filter"
-            onChange={() => {
-              if (inputRef.current) setFilter(inputRef.current.value)
+            onChange={(e) => {
+              if (e.target.value) setFilter(e.target.value)
             }}
           />
           <ul>
             {users
               .filter((user) => new RegExp(filter, 'i').test(user.name))
               .map((user) => (
-                <li key={user.type}>
+                <li key={user._id}>
                   <a
                     href="#"
                     onClick={(evt) => {
