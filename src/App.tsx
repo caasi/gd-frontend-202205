@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
 
 import { getUserList, getPostListById } from "./libs/api";
 import "./App.css";
@@ -7,10 +7,10 @@ import Post from "./components/Posts";
 import Users from "./components/Users";
 
 function App() {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [filter, setFilter] = useState("");
   const [currentUser, setCurrentUser] = useState<string>();
   const memoizedUsers = useMemo(() => getUserList(), []);
+  //const memoizedUsers = useCallback(() => getUserList(), []);
   const memoizedPost = useMemo(() => {
     if (!currentUser) {
       return Promise.resolve([]);
@@ -18,8 +18,8 @@ function App() {
     return getPostListById(currentUser);
   }, [currentUser]);
 
-  const [users, error, pending] = usePromise(memoizedUsers);
-  const [posts] = usePromise(memoizedPost);
+  const [users = [], userError, userPending] = usePromise(memoizedUsers);
+  const [posts, postError, postPending] = usePromise(memoizedPost);
 
   return (
     <div className="App">
@@ -28,28 +28,30 @@ function App() {
         <section>
           <h2>Users</h2>
           <input
-            ref={inputRef}
             type="text"
             placeholder="filter"
-            onChange={() => {
-              if (inputRef.current) setFilter(inputRef.current.value);
+            onChange={(evt) => {
+              if (evt.target.value) {
+                setFilter(evt.target.value);
+                // setPosts([]);
+              }
             }}
           />
           <ul>
-            {pending && <div>Loading...</div>}
-            {users != undefined &&
-              users
-                .filter((user) => new RegExp(filter, "i").test(user.name))
-                .map((user) => (
-                  <Users
-                    key={user._id}
-                    user={user}
-                    setCurrentUser={setCurrentUser}
-                  />
-                ))}
+            {userPending && <div>Loading...</div>}
+            {users
+              .filter((user) => new RegExp(filter, "i").test(user.name))
+              .map((user) => (
+                <Users
+                  key={user._id}
+                  user={user}
+                  setCurrentUser={setCurrentUser}
+                />
+              ))}
           </ul>
         </section>
-        {posts != undefined && <Post posts={posts} />}
+        {postPending && <div>Loading posts...</div>}
+        {!postPending && posts != undefined && <Post posts={posts} />}
       </div>
     </div>
   );
