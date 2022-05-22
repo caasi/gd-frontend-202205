@@ -5,6 +5,7 @@ import "./App.css";
 import usePromise from "./hooks/use-promise";
 import Post from "./components/Posts";
 import Users from "./components/Users";
+import InputFilter from "./components/InputFilter";
 
 function App() {
   const [filter, setFilter] = useState("");
@@ -27,16 +28,8 @@ function App() {
         <h1>Hello Vite + React!</h1>
         <section>
           <h2>Users</h2>
-          <input
-            type="text"
-            placeholder="filter"
-            onChange={(evt) => {
-              if (evt.target.value) {
-                setFilter(evt.target.value);
-                // setPosts([]);
-              }
-            }}
-          />
+          <InputFilter placeholder="filter" onChangeFunc={setFilter} />
+
           <ul>
             {userPending && <div>Loading...</div>}
             {users
