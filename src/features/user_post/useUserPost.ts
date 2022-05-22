@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import usePromise from "../../hooks/use-promise";
 import { getPostListById, getUserList } from "../../libs/api";
-import { Post } from "../../libs/post";
-import { User } from "../../libs/user";
 
 const useUserPost = (currentUser: string | undefined) => {
   const memoizedUsers = useMemo(() => getUserList(), []);
